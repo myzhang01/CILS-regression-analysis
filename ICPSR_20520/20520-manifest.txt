@@ -1,0 +1,68 @@
+File Manifest for ICPSR 20520
+
+Portes, Alejandro, and Rubén G. Rumbaut. Children of Immigrants
+Longitudinal Study (CILS), San Diego, California, Ft. Lauderdale and Miami,
+Florida, 1991-2006. ICPSR20520-v3. Ann Arbor, MI: Inter-university
+Consortium for Political and Social Research [distributor], 2018-12-12.
+http://doi.org/10.3886/ICPSR20520.v3
+
+Details on the version history can be found below the file listings.
+
+
+Study-level Documentation
+
+    Filename                            Record  Record    Var.    Date        MD5
+                                        Length  Count     Count   Updated     Checksum
+
+    20520-descriptioncitation.pdf       -       -         -       2020-09-01  -
+
+    20520-related_literature.txt        -       -         -       daily       -
+
+    20520-manifest.txt                  -       -         -       daily       -
+
+
+DS0001 Children of Immigrants Longitudinal Study (CILS), San Diego,
+California, Ft. Lauderdale and Miami, Florida, 1991-2006
+
+    Filename                            Record  Record    Var.    Date        MD5
+                                        Length  Count     Count   Updated     Checksum
+
+    20520-0001-Codebook.pdf             -       -         -       2018-12-12  82d83b4d16d4cc4d11aeaa43fd95e119
+
+    20520-0001-Data.dta                 -       5,262     665     2018-12-12  43472594719842a74bf28af8215a480b
+
+    20520-0001-Data.rda                 -       5,262     665     2018-12-12  f7140f04c88479f47f0ee3788a29e4de
+
+    20520-0001-Data.sav                 -       5,262     665     2018-12-12  f8ebfc4233bbe66849a289e83b4af8dc
+
+    20520-0001-Data.stc                 -       5,262     665     2018-12-12  3c0d2464b658568371d9063f5076a42c
+
+    20520-0001-Data.tsv                 -       5,262     665     2018-12-12  93fb3a2a50f0bc1c30b10dc3ffca9d08
+
+    20520-0001-Data.txt                 1516    5,262     665     2018-12-12  2292088862146801f4ca113862872825
+
+    20520-0001-Questionnaire.pdf        -       -         -       2018-12-12  f4c619de9ccd8215cd5c4267e06f34fc
+
+    20520-0001-Setup.dct                -       -         -       2018-12-12  ae91317cbeabac865fdbb80f45c27d68
+
+    20520-0001-Setup.do                 -       -         -       2018-12-12  df05cf0e473c131d17d795f33bcbfdeb
+
+    20520-0001-Setup.sas                -       -         -       2018-12-12  3b675b500b362f32a59c2978128abcde
+
+    20520-0001-Setup.sps                -       -         -       2018-12-12  1e07563d3f7f7dc6b2fc64fddd7b0260
+
+    20520-0001-Supplemental_syntax.do   -       -         -       2018-12-12  2d308f2e4c26d88b4820b55a09f15a15
+
+    20520-0001-Supplemental_syntax.sas  -       -         -       2018-12-12  72ac132ceaedd56255873d3dedeba21f
+
+
+Version History
+
+2018-12-12 SDA online analysis has been made available for this collection.
+Additionally, a geographic component has been added to the study title.
+2012-01-23 Variable naming convention detail was added to the updated
+codebook.  2011-12-20 New covers were added to the documentation.  2010-08-
+19 Minor edits were made to some variable labels and question text.  2008-
+01-07 Minor edits were made to the metadata, and additional text describing
+the third survey, CILS-III, has been included.  2007-10-18 Variable naming
+convention detail was added to the codebook.
