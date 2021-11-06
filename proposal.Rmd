@@ -1,0 +1,38 @@
+---
+title: 'Project Proposal'
+author: 'Isaac Cheong, Sam Tan, Max Zhang'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+load('ICPSR_20520/DS0001/20520-0001-Data.rda')  # creates df called da20520.0001
+cils <- da20520.0001
+```
+
+# Introduction
+
+# Data Description
+
+# EDA
+
+# Model Selection
+
+# Model Diagnostics
+
+# Prediction
+
+# Conclusion
+
+\newpage
+
+# Appendix
+
+```{r}
+head(cils[ ,1:5], 5)
+```
+
+
+
+
