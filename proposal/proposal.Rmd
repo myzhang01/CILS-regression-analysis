@@ -9,31 +9,47 @@ knitr::opts_chunk$set(echo = TRUE)
 
 load('ICPSR_20520/DS0001/20520-0001-Data.rda')  # creates df called da20520.0001
 cils <- da20520.0001
+library(ggplot2)
 ```
-
-# Potential title: 
-- Social mobility of the children of immigrants in America
-- The Adaptation of the Immigrant Second Generation in America
 
 # Introduction
 
-What makes some second generation Americans more adaptive to the mainstrain society than others? In this report, we set out to investiage this question by predicting one of the important measurements for overall happiness: income and financial satisfication. 
+What makes some second generation Americans more adaptive to the mainstream society than others? In this report, we set out to investigate this question by predicting one of the important measurements for overall happiness: income and financial satisfaction. Using survey data provided by the Center for Migration and Development at Princeton University, we will predict the income level of 2500+ second generation Americans residing in San Diego and Miami in 2005 using baseline information on immigrant families and children’s own demographic characteristics: language use; self-identities; and academic attainment. 
 
-Using data provided by the Center for Migration and Development at princeton univeristy, we will predict the income level of 2500+ second generation Americans residing in San Diego and Miami in 2005 based on factors such as their home environment, parents' language compentency, and their personal beliefs. 
 
 # Data Description
 
 # EDA
 
+In our Exploratory Data Analysis, we will examine each response and explanatory variable to check if these variables fit the basic assumptions of linear regression to provide an accurate and concise context for our future analysis, including model selection and model diagnostic. 
+
+If we see the histogram of our response variable`Income` (See Appendix), we can observe that this histogram is heavily skewed to the right, violating our normality assumption of the response variable. To fix this issue, we will apply a log transformation to the variable income. As you see in the Appendix, our log-transformed `income` histogram looks approximately normal distribution, and this is much more aligned with the linear regression assumption of response variable normality. We are not excluding the maximum point of the histogram because it is reasonable that someone earns $17000 per month, and it is hard to consider this point as an error from the data collection process.
+
+Our data analysis on explanatory variables will be more complicated since we have many variables. We will mainly use visual tools in the ggplot2 package to examine and analyze the distribution of each explanatory variable. Possible visual tools will be a correlation matrix, multi-level boxplot, and bivariate scatter plot. Through this analysis of this explanatory variable, we should be able to answer the following questions. 
+
+(1) What will be the correlation between `income` and our explanatory variables? What will be the correlation between explanatory variables? Can we identify any collinearity between variables? 
+
+(2) Using our graphical demonstration of explanatory variables, can we identify any unusual data point in our explanatory variables? Can we determine if the data point is an outlier? 
+
+(3) Should we re-group our categorical variable to dichotomous variables like "Yes" or "No"? Can we change our categorical variable to a numerical variable by checking the linearity of the boxplot between income and categorical variables? 
+
+(4) Can we identify any possible interaction variables using relevant co-plot or boxplot? 
+
+Our research paper hopes to answer all of these questions from this exploratory data analysis to make a better conclusion and more accurate causal inference. 
+
+
 # Model Selection
 
-EDA 
-Shrikage? A way to reduce the variance of predictions by reducing the size of each coeffient, but the coeffients will be biased. LASSO 
-Stepwise/forward/Backward selection? 
-exhaustive search
+There are 3 major methods for selecting models: shrinkage(ridge and LASSO), greedy selection (stepwise/forward/backward selection) and optional(exhaustive) subset selection. Since we have roughly around 400 categorical variables (each with roughly 4 values), we will have around 1600 individual dummy variables. For exhaustive subset selection, it will take way too long to run. For greedy selection, it will only explore a small number of possible models relative to all the possible model options (2^1600) out there. Shrinkage methods like LASSO will have good performance for models with many possible features like ours because it remains effective regardless of the number of explanatory variables. In particular, we will use LASSO to make predictions because it will provide sparser coefficients, which allows us to use those remaining variables to do inference in later sections. 
+
+To do LASSO, we will first standardize the variable, so larger weights reflects greater importance. By the time we shrink the variables, only the important ones will be left. We will choose the penality size lambda based on cross validation(#?). 
 
 
 # Model Diagnostics
+
+There are 4 major things to check for diagnosting a model. Because we don't know what the real epsilons are, we will approximate them by using the fitted residuals(#?). 
+
+To check whether the mean of the epsilons is centered at 0, we will plot residuals against all the exploratory variables and do feature engineering if necessary to transform specific variables that don't have a zero mean(#?). To check whether the epsilons have constant variance, we will plot fitted value of y against the residuals. If larger values of y conrrespond to a large variance of residuals, we will do bootstrap by cases during inference. To check normality for our residuals, we will make a normal Q-Q plot of standardized residuals plotted against our theoretical quantiles, checking if the points line up across the y = x line. If it's not, then we will reply on bootstraps by cases to do inference. 
 
 
 # Prediction
@@ -44,10 +60,45 @@ exhaustive search
 
 # Appendix
 
+**Loading the dataset and assigning the data to the variable "cils"**
+
+```{r, eval=FALSE}
+
+load('ICPSR_20520/DS0001/20520-0001-Data.rda')  # creates df called da20520.0001
+cils <- da20520.0001
+```
+
+
+**Sample of dataet** 
+
+As you see it here, the dataset cils can be loaded into R and looks beautiful. 
 ```{r}
 head(cils[ ,1:5], 5)
 ```
 
+**Distribution of `income`**
+
+```{r, fig.width=5, fig.height = 3, fig.align='center'}
+ggplot(cils, aes(x = V421)) + 
+  geom_histogram(na.rm = TRUE, binwidth = 500,
+                 fill="#69b3a2", color="#e9ecef", alpha=0.9) +
+  xlab("Income") +
+  ylab("Frequency")
+```
+
+**Maximum income**
+```{r}
+max(cils$V421, na.rm = TRUE)
+```
 
 
+**Histogram of Log Transformed `income`**
 
+```{r, fig.width=5, fig.height = 3, fig.align='center'}
+ggplot(cils, aes(x = log(V421))) + 
+  geom_histogram(na.rm = TRUE,binwidth = 0.4,
+                 fill="#69b3a2", color="#e9ecef", alpha=0.9) +
+  xlab("Income") +
+  ylab("Frequency")
+
+```
