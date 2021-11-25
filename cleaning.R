@@ -22,6 +22,10 @@ test <- nonnumeric %>%
 unordered <- nonnumeric[test > 6]
 ordered <- nonnumeric[test <= 6]
 
+ordered_num <- ordered %>% 
+  lapply(FUN = as.integer) %>% 
+  lapply(FUN = function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE))
+
 
 
 
