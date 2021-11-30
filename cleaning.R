@@ -14,6 +14,14 @@ cils <- as_tibble(da20520.0001) %>%
   select(!matches('V4[[:alnum:]]{2,}'))  # remove 2005 variables
 
 
+# Removing mostly NA columns ----------------------------------------------
+
+na_proportions <- da20520.0001 %>%
+  #summarize(across(.fns = function(x) sum(is.na(x)) / length(x)))
+  lapply(FUN = function(x) sum(is.na(x)) / length(x))
+names(na_proportions) <- labels
+
+
 # Get non-numeric variables -----------------------------------------------
 
 numeric <- cils %>%
