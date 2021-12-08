@@ -4,46 +4,60 @@ library(lars)
 
 source('cleaning.R')
 
-numeric <- numeric %>%
-  mutate(income = da20520.0001$V421) %>%
-  filter(!is.na(income))
-
 # standardize
 numeric_std <- numeric %>%
-  lapply(FUN = as.integer) %>%
-  lapply(FUN = function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)) %>%
-  as.data.frame() %>%
+  select(where(function(x) sum(x) != 0)) %>%  # this is hacked solution and should be improved
+  mutate(across(.cols = everything(), function(x) (x - mean(x)) / sd(x))) %>%
   as.matrix()
 
-x <- numeric_std[ ,-80]
-y <- numeric_std[ ,80]
+# get income column
+income <- as_tibble(da20520.0001) %>%
+  filter(!is.na(V421)) %>%
+  pull(V421)
 
-lasso <- cv.glmnet(x = numeric_std[ ,-80],
-                   y = numeric_std[ ,80],
+# do lasso's
+lasso <- cv.glmnet(x = numeric_std,
+                   y = income,
                    type.measure = 'mse',
                    family = 'gaussian',
                    alpha = 1)
-lasso1 <- glmnet(x = numeric_std[ ,-80],
-                 y = numeric_std[ ,80],
+lasso1 <- glmnet(x = numeric_std,
+                 y = income,
                  family = 'gaussian',
                  alpha = 1,
                  lambda = lasso$lambda.min)
 
+# categorical var lasso
+lasso2 <- cv.glmnet(x = nonnumeric_mat,
+                    y = income,
+                    type.measure = 'mse',
+                    family = 'gaussian',
+                    alpha = 1)
+#lasso3 <- glmnet(x = nonnumeric_mat,
+#                 y = income,
+#                 family = 'gaussian',
+#                 alpha = 1,
+#                 lambda = lasso2$lambda.min)
 
 
-larsobj <- lars(x = numeric_std[ ,-80],
-                y = numeric_std[ ,80],
-                type = 'lasso')
+# get names of nonzero coefficient variables
+# max stole all this code so don't ask him how it works
+tmp_coeffs <- coef(lasso, s = "lambda.min")
+tmp_coeffs <- data.frame(name = tmp_coeffs@Dimnames[[1]][tmp_coeffs@i + 1], coefficient = tmp_coeffs@x)
+tmp_coeffs <- tmp_coeffs[-1, ]
 
-reg <- lm(income ~ V141 + V142 + V143 + V145 + V146 + V148 + C4,
-          data = as.data.frame(numeric_std))
+tmp_coeffs2 <- coef(lasso2, s = "lambda.min")
+tmp_coeffs2 <- data.frame(name = tmp_coeffs2@Dimnames[[1]][tmp_coeffs2@i + 1], coefficient = tmp_coeffs2@x)
+tmp_coeffs2 <- tmp_coeffs2[-1, ]
+
+
+# create formula for lm
+formula <- paste('income ~', paste(tmp_coeffs$name, collapse = ' + '))
+
+reg <- lm(formula = formula,
+          data = cbind(as.data.frame(numeric_std), income))
 summary(reg)
 
 
-# ignore for now
-na_proportions <- numeric %>%
-  #summarize(across(.fns = function(x) sum(is.na(x)) / length(x)))
-  lapply(FUN = function(x) sum(is.na(x)) / length(x)) %>%
-  as.data.frame()
 
 

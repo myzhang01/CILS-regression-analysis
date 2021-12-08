@@ -10,24 +10,52 @@ load('ICPSR_20520/DS0001/20520-0001-Data.rda')
 labels <- attributes(da20520.0001)$variable.labels
 
 cils <- as_tibble(da20520.0001) %>%
+  filter(!is.na(V421)) %>%  # remove all observations with missing income
   remove_all_labels() %>%
   select(!matches('V4[[:alnum:]]{2,}'))  # remove 2005 variables
+cils_inc_missing <- as_tibble(da20520.0001) %>%
+  filter(is.na(V421))
 
 
-# Removing mostly NA columns ----------------------------------------------
-
-na_proportions <- da20520.0001 %>%
-  #summarize(across(.fns = function(x) sum(is.na(x)) / length(x)))
-  lapply(FUN = function(x) sum(is.na(x)) / length(x))
-names(na_proportions) <- labels
-
-
-# Get non-numeric variables -----------------------------------------------
+# Deal with numeric variables ---------------------------------------------
 
 numeric <- cils %>%
-  select(!where(is.factor))
+  select(where(is.double)) %>%
+  select(!CASEID)
+
+numeric_na <- numeric %>%
+  lapply(FUN = function(x) sum(is.na(x)) / length(x)) %>%
+  unlist()
+numeric_na <- names(numeric_na[numeric_na >= 0.5])  # the 0.5 is the threshold for removing NAs
+
+numeric <- numeric %>%
+  select(!all_of(numeric_na)) %>%
+  mutate(across(.cols = everything(), is.na, .names = '{.col}_NA')) %>%
+  mutate(across(.cols = ends_with('_NA'), as.double)) %>%
+  # mean imputation: for all columns not ending with NA, replace missing value
+  # with the mean of the column
+  mutate(across(.cols = !ends_with('_NA'), ~if_else(is.na(.), mean(., na.rm = TRUE), .)))
+
+
+# Deal with non-numeric variables -----------------------------------------
+
 nonnumeric <- cils %>%
   select(where(is.factor))
+
+nonnumeric_na <- nonnumeric %>%
+  lapply(FUN = function(x) sum(is.na(x)) / length(x)) %>%
+  unlist()
+nonnumeric_na <- names(nonnumeric_na[nonnumeric_na >= 0.5])
+
+nonnumeric <- nonnumeric %>%
+  select(!all_of(nonnumeric_na)) %>%
+  mutate(across(.cols = everything(), addNA))
+
+nonnumeric_mat <- model.matrix(~., data = nonnumeric)[ ,-1]
+
+
+
+# older code below --------------------------------------------------------
 
 unordered <- nonnumeric %>%
   select(where(function(x) nlevels(x) > 6))  # does not count NA as a level,
@@ -40,6 +68,13 @@ ordered <- nonnumeric %>%
 #  lapply(FUN = as.integer) %>%
 #  lapply(FUN = function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE))
 
+
+# Removing mostly NA columns ----------------------------------------------
+
+na_proportions <- da20520.0001 %>%
+  #summarize(across(.fns = function(x) sum(is.na(x)) / length(x)))
+  lapply(FUN = function(x) sum(is.na(x)) / length(x))
+names(na_proportions) <- labels
 
 # Fix unordered and ordered -----------------------------------------------
 
