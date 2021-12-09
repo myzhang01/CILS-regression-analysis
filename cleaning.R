@@ -48,7 +48,7 @@ nonnumeric_na <- nonnumeric %>%
 nonnumeric_na <- names(nonnumeric_na[nonnumeric_na >= 0.5])
 
 nonnumeric <- nonnumeric %>%
-  select(!all_of(nonnumeric_na)) %>%
+  select(!all_of(c(nonnumeric_na, 'V32', 'V37', 'V233', 'V238', 'V263', 'V62', 'V64', 'V264'))) %>%
   mutate(across(.cols = everything(), addNA))
 
 nonnumeric_mat <- model.matrix(~., data = nonnumeric)[ ,-1]

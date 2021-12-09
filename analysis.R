@@ -10,17 +10,30 @@ numeric_std <- numeric %>%
   mutate(across(.cols = everything(), function(x) (x - mean(x)) / sd(x))) %>%
   as.matrix()
 
+nonnumeric_mat <- nonnumeric_mat %>%
+  apply(MARGIN = 2, FUN = function(x) (x - mean(x)) / sd(x))
+
 # get income column
 income <- as_tibble(da20520.0001) %>%
   filter(!is.na(V421)) %>%
   pull(V421)
 
+# combine numeric and nonnumeric
+combined <- cbind(numeric_std, nonnumeric_mat)
+
 # do lasso's
-lasso <- cv.glmnet(x = numeric_std,
+lasso <- cv.glmnet(x = combined,
                    y = income,
                    type.measure = 'mse',
                    family = 'gaussian',
                    alpha = 1)
+
+lasso_test <- cv.glmnet(x = combined[ ,2500:3500],
+                   y = income,
+                   type.measure = 'mse',
+                   family = 'gaussian',
+                   alpha = 1)
+
 lasso1 <- glmnet(x = numeric_std,
                  y = income,
                  family = 'gaussian',
@@ -52,10 +65,14 @@ tmp_coeffs2 <- tmp_coeffs2[-1, ]
 
 
 # create formula for lm
-formula <- paste('income ~', paste(tmp_coeffs$name, collapse = ' + '))
+coeffs <- tmp_coeffs$name %>%
+  str_replace_all('[[:punct:]]*[[:space:]]*', '')
+formula <- paste('income ~', paste(coeffs, collapse = ' + '))
+
+colnames(combined) <- str_replace_all(colnames(combined), '[[:punct:]]*[[:space:]]*', '')
 
 reg <- lm(formula = formula,
-          data = cbind(as.data.frame(numeric_std), income))
+          data = cbind(as.data.frame(combined), income))
 summary(reg)
 
 
