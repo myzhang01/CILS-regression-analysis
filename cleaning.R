@@ -35,7 +35,7 @@ numeric <- numeric %>%
   # mean imputation: for all columns not ending with NA, replace missing value
   # with the mean of the column
   mutate(across(.cols = !ends_with('_NA'), ~if_else(is.na(.), mean(., na.rm = TRUE), .)))
-
+numeric <- as.matrix(numeric)
 
 # Deal with non-numeric variables -----------------------------------------
 
@@ -52,6 +52,25 @@ nonnumeric <- nonnumeric %>%
   mutate(across(.cols = everything(), addNA))
 
 nonnumeric_mat <- model.matrix(~., data = nonnumeric)[ ,-1]
+
+
+# Test-train split --------------------------------------------------------
+
+combined <- cbind(numeric, nonnumeric_mat)
+
+set.seed(123)
+indices <- sample(1:nrow(combined), size = 0.7*nrow(combined))
+
+income <- as_tibble(da20520.0001) %>%
+  filter(!is.na(V421)) %>%
+  pull(V421)
+income_train <- income[indices]
+income_test <- income[-indices]
+
+train <- combined[indices, ]
+test <- combined[-indices, ]
+
+
 
 
 
