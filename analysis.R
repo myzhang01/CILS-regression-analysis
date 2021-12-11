@@ -2,7 +2,7 @@
 library(glmnet)
 library(lars)
 
-source('cleaning.R')
+#source('cleaning.R')
 
 # do lasso's
 lasso <- cv.glmnet(x = train,
