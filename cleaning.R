@@ -63,7 +63,8 @@ indices <- sample(1:nrow(combined), size = 0.7*nrow(combined))
 
 income <- as_tibble(da20520.0001) %>%
   filter(!is.na(V421)) %>%
-  pull(V421)
+  pull(V421) %>%
+  log()
 income_train <- income[indices]
 income_test <- income[-indices]
 
