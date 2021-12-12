@@ -40,7 +40,7 @@ many_levels <- c('V32', 'V37', 'V233', 'V238', 'V263', 'V62', 'V64', 'V264')    
 
 categorical <- categorical %>%
   select(where(~ sum(is.na(.x)) / length(.x) < 0.5)) %>%
-  select(where(~ nlevels(.x) <= 25)) %>%
+#  select(where(~ nlevels(.x) <= 25)) %>%
 #  select(!all_of(many_levels)) %>%                                              # drop variables with too many levels
   mutate(across(.cols = everything(), addNA))                                   # make NA a level
 categorical <- model.matrix(~ ., data = categorical)[ ,-1]                      # create design matrix, excluding intercept
