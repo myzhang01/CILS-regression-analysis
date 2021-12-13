@@ -9,7 +9,9 @@ knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(sjlabelled)  # for remove_all_labels()
 library(glmnet)
+```
 
+```{r}
 # import
 load('ICPSR_20520/DS0001/20520-0001-Data.rda')
 
@@ -44,7 +46,7 @@ ggplot(cils, aes(x = log(V421))) +
   ylab("Frequency")
 ```
 
-```{r, echo = FALSE}
+```{r}
 income <- cils %>%
   pull(V421) %>%
   log()

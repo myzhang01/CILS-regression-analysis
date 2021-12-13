@@ -2,7 +2,7 @@
 library(glmnet)
 
 # combine
-combined <- cbind(income, numeric, categorical)
+combined <- cbind(log.income, numeric, categorical)
 
 # test-train split
 set.seed(123)
@@ -29,7 +29,7 @@ tmp_coeffs <- tmp_coeffs[-1, ]
 # create formula for lm
 coeffs <- tmp_coeffs$name %>%
   str_replace_all('[[:punct:]]*[[:space:]]*[=]*', '')
-formula <- paste('income ~', paste(coeffs, collapse = ' + '))
+formula <- paste('log.income ~', paste(coeffs, collapse = ' + '))
 
 colnames(test) <- str_replace_all(colnames(test), '[[:punct:]]*[[:space:]]*[=]*', '')
 

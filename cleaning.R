@@ -9,9 +9,10 @@ load('ICPSR_20520/DS0001/20520-0001-Data.rda')
 # get features and response
 cils <- as_tibble(da20520.0001) %>%
   filter(!is.na(V421)) %>%
+  select(!c(CASEID, V1)) %>%
   remove_all_labels()
 
-income <- cils %>%
+log.income <- cils %>%
   pull(V421) %>%
   log()
 
@@ -21,8 +22,7 @@ cils <- cils %>%
 
 # deal with numeric variables
 numeric <- cils %>%
-  select(where(is.double)) %>%
-  select(!CASEID)
+  select(where(is.double))
 
 numeric <- numeric %>%
   select(where(~ sum(is.na(.x)) / length(.x) < 0.5)) %>%                        # select variables less than 50% NA
@@ -39,7 +39,6 @@ categorical <- cils %>%
 many_levels <- c('V32', 'V37', 'V233', 'V238', 'V263', 'V62', 'V64', 'V264')    # occupations
 
 categorical <- categorical %>%
-  select(where(~ sum(is.na(.x)) / length(.x) < 0.5)) %>%
   #select(where(~ nlevels(.x) <= 25)) %>%                                       # drop variables with more than 25 levels
   #select(!all_of(many_levels)) %>%                                             # drop variables in many_levels
   mutate(across(.cols = everything(), addNA))                                   # make NA a level
