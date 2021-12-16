@@ -28,10 +28,10 @@ tmp_coeffs <- tmp_coeffs[-1, ]
 
 # create formula for lm
 coeffs <- tmp_coeffs$name %>%
-  str_replace_all('[[:punct:]]*[[:space:]]*[=]*', '')
-formula <- paste('log.income ~', paste(coeffs, collapse = ' + '))
+  str_replace_all('[[:punct:]]*[[:space:]]*[=+]*', '')
+formula <- paste('logincome ~', paste(coeffs, collapse = ' + '))
 
-colnames(test) <- str_replace_all(colnames(test), '[[:punct:]]*[[:space:]]*[=]*', '')
+colnames(test) <- str_replace_all(colnames(test), '[[:punct:]]*[[:space:]]*[=+]*', '')
 
 reg <- lm(formula = formula,
           data = as.data.frame(test))
