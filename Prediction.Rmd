@@ -50,7 +50,8 @@ fit.plot <- ggplot(df_test.pred, aes(x=log.income, y=s1)) +
   annotate(geom="text",size =4, x = 9, y = 5,
            label=paste("NULL (lambda = 1se) RMSE:",
                        round(sqrt(mean((df_null.pred$s1 - df_train$logincome)^2)),2)),
-           color="red")
+           color="red") +
+  theme_minimal()
 fit.plot
 ```
 
