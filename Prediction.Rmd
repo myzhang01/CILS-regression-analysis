@@ -1,0 +1,63 @@
+---
+title: "Prediction"
+output: html_document
+---
+```{r}
+library(ggplot2)
+```
+
+
+```{r}
+test.pred <- predict(cv, s= cv$lambda.min, newx= test[ , -1],
+interval="prediction", level=0.95) # test set predictions
+train.pred <- predict(cv, s = cv$lambda.min, newx=train[ , -1])
+null.pred <- predict(cv, s = cv$lambda.1se, newx = train[ , -1])
+```
+
+```{r}
+df_test <- as.data.frame(test)
+df_train <- as.data.frame(train)
+df_test.pred <- as.data.frame(test.pred)
+df_train.pred <- as.data.frame(train.pred)
+df_null.pred <- as.data.frame(null.pred)
+```
+
+```{r}
+log.income <- df_test$logincome
+
+fit.plot <- ggplot(df_test.pred, aes(x=log.income, y=s1)) +
+  geom_point() +
+  geom_smooth(aes(color="model"), stat="smooth", method="gam", formula=y~s(x, bs="cs")) +
+  geom_line(aes(x=seq(min(log.income, na.rm = TRUE), max(log.income, na.rm = TRUE),
+                      length.out=length(log.income)),
+                y=seq(min(log.income, na.rm = TRUE), max(log.income, na.rm = TRUE),
+                      length.out=length(log.income)),color="ideal")) +
+  geom_line(aes(y = 7.314, color = "null (lambda = 1SE)"), size =1)+
+# creates ideal model line
+  labs(x="actual values", y="predicted values") +
+  scale_color_manual("linear relation", values=c("red", "blue", "green")) +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = c(0.25, 0.8)) + 
+  # add legend of lines
+  ggtitle("Linear Model: Predicting Log Income") +
+  annotate(geom="text", size =4, x = 9, y = 6, 
+           label = paste("Train RMSE:", 
+                         round(sqrt(mean((df_train.pred$s1 - df_train$logincome)^2)), 2)),
+           color="red") + 
+  annotate(geom="text",size =4, x = 9, y = 5.5,
+           label=paste("Test RMSE:",
+                       round(sqrt(mean((df_test.pred$s1 - df_test$logincome)^2)),2)),
+           color="red") +
+  annotate(geom="text",size =4, x = 9, y = 5,
+           label=paste("NULL (lambda = 1se) RMSE:",
+                       round(sqrt(mean((df_null.pred$s1 - df_train$logincome)^2)),2)),
+           color="red")
+fit.plot
+```
+
+```{r}
+plot(df_test.pred$s1, test[,1] - df_test.pred$s1, xlab = "Prediction", ylab = "Residual") + abline(h = 0)
+
+```
+
+
+
